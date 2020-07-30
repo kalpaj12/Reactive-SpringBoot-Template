@@ -24,4 +24,7 @@ public class User {
 
 	@Column(name = "name", length = 200)
 	private String name;
+
+	@Column(name = "phone_number", length = 20)
+	private String phoneNumber;
 }
