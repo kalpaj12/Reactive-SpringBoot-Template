@@ -10,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,37 @@ public class UserController {
 			return ResponseEntity.ok().body(userService.findAll());
 		} catch (Exception e) {
 			return new ResponseEntity<List<User>>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@DeleteMapping(value = "/delete/{id}")
+	public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
+		try {
+			Optional<User> userOpt = userService.findByUserId(id);
+			User user = userOpt.get();
+			if (user != null) {
+				userService.deleteUser(user);
+				return ResponseEntity.ok().body(user);
+			} else {
+				return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PutMapping(value = "/update")
+	public ResponseEntity<User> updateUser(@RequestBody User user) {
+		try {
+			Optional<User> userOpt = userService.findByUserId(user.getUserId());
+			User toUpdate = userOpt.get();
+			if (toUpdate != null) {
+				return ResponseEntity.ok(userService.updateUser(user));
+			} else {
+				return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
 		}
 	}
 
