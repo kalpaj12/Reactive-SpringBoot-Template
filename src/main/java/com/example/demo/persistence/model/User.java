@@ -2,6 +2,7 @@ package com.example.demo.persistence.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -19,7 +20,8 @@ import lombok.experimental.SuperBuilder;
 public class User {
 
 	@Id
-	@Column(name = "user_id", unique = true, nullable = false)
+	@GeneratedValue
+	@Column(name = "user_id", unique = true, nullable = false, insertable = false)
 	private Long userId;
 
 	@Column(name = "name", length = 200)
