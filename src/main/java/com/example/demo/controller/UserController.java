@@ -1,8 +1,5 @@
 package com.example.demo.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.example.demo.persistence.model.User;
 import com.example.demo.service.UserService;
 
@@ -19,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @RestController
 @RequestMapping(value = "/api/v1/user")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -28,62 +28,53 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping(value = "/create")
-	public ResponseEntity<User> saveUser(@RequestBody User user) {
-		try {
-			return ResponseEntity.ok().body(userService.saveUser(user));
-		} catch (Exception e) {
-			System.out.println(e);
-			return new ResponseEntity<User>(HttpStatus.EXPECTATION_FAILED);
-		}
+	public Mono<ResponseEntity<User>> saveUser(@RequestBody User user) {
+		return userService.saveUser(user).map(u -> ResponseEntity.ok().body(u))
+				.defaultIfEmpty(ResponseEntity.badRequest().build());
 	}
 
 	@GetMapping(value = "/view/{id}")
-	public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
-		try {
-			return ResponseEntity.ok().body(userService.findByUserId(id).orElse(new User()));
-		} catch (Exception e) {
-			return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-		}
+	public Mono<ResponseEntity<User>> getUser(@PathVariable("id") Long id) {
+		return userService.findByUserId(id).map(u -> ResponseEntity.ok().body(u))
+				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 
 	@GetMapping(value = "/viewAll")
-	public ResponseEntity<List<User>> getAllUsers() {
-		try {
-			return ResponseEntity.ok().body(userService.findAll());
-		} catch (Exception e) {
-			return new ResponseEntity<List<User>>(HttpStatus.BAD_REQUEST);
-		}
+	public Flux<User> getAllUsers() {
+		return userService.findAll();
 	}
 
-	@DeleteMapping(value = "/delete/{id}")
-	public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
-		try {
-			Optional<User> userOpt = userService.findByUserId(id);
-			User user = userOpt.get();
-			if (user != null) {
-				userService.deleteUser(user);
-				return ResponseEntity.ok().body(user);
-			} else {
-				return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-			}
-		} catch (Exception e) {
-			return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-		}
-	}
+	// @Todo: Fix the below
 
-	@PutMapping(value = "/update")
-	public ResponseEntity<User> updateUser(@RequestBody User user) {
-		try {
-			Optional<User> userOpt = userService.findByUserId(user.getUserId());
-			User toUpdate = userOpt.get();
-			if (toUpdate != null) {
-				return ResponseEntity.ok(userService.updateUser(user));
-			} else {
-				return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-			}
-		} catch (Exception e) {
-			return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-		}
-	}
+	// @DeleteMapping(value = "/delete/{id}")
+	// public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
+	// try {
+	// Optional<User> userOpt = userService.findByUserId(id);
+	// User user = userOpt.get();
+	// if (user != null) {
+	// userService.deleteUser(user);
+	// return ResponseEntity.ok().body(user);
+	// } else {
+	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+	// }
+	// } catch (Exception e) {
+	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+	// }
+	// }
+
+	// @PutMapping(value = "/update")
+	// public ResponseEntity<User> updateUser(@RequestBody User user) {
+	// try {
+	// Optional<User> userOpt = userService.findByUserId(user.getUserId());
+	// User toUpdate = userOpt.get();
+	// if (toUpdate != null) {
+	// return ResponseEntity.ok(userService.updateUser(user));
+	// } else {
+	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+	// }
+	// } catch (Exception e) {
+	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+	// }
+	// }
 
 }

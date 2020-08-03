@@ -12,25 +12,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @Service
+@Slf4j
+@Transactional
 public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository userRepository;
 
 	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-	public User saveUser(User user) {
+	public Mono<User> saveUser(User user) {
 		return userRepository.save(user);
 	}
 
 	@Override
-	public Optional<User> findByUserId(Long id) {
+	public Mono<User> findByUserId(Long id) {
 		return userRepository.findById(id);
 	}
 
 	@Override
-	public List<User> findAll() {
+	public Flux<User> findAll() {
 		return userRepository.findAll();
 	}
 
@@ -40,7 +45,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User updateUser(User user) {
+	public Mono<User> updateUser(User user) {
 		return userRepository.save(user);
 	}
 
