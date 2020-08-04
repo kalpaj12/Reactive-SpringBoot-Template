@@ -1,19 +1,19 @@
 package com.example.demo.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.example.demo.persistence.model.User;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 public interface UserService {
-	public User saveUser(User user);
+	public Mono<User> saveUser(User user);
 
-	public Optional<User> findByUserId(Long id);
+	public Mono<User> findByUserId(Long id);
 
-	public List<User> findAll();
+	public Flux<User> findAll();
 
-	public void deleteUser(User user);
+	public Mono<Void> deleteUser(User user);
 
-	public User updateUser(User user);
+	public Mono<User> updateUser(User user);
 
 }
