@@ -1,23 +1,17 @@
 package com.example.demo.service.implementation;
 
-import java.util.List;
-import java.util.Optional;
-
 import com.example.demo.persistence.model.User;
 import com.example.demo.persistence.repository.UserRepository;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 @Transactional
 public class UserServiceImpl implements UserService {
 
@@ -40,8 +34,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void deleteUser(User user) {
-		userRepository.delete(user);
+	public Mono<Void> deleteUser(User user) {
+		return userRepository.delete(user);
 	}
 
 	@Override

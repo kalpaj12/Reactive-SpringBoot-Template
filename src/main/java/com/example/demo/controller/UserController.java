@@ -4,7 +4,6 @@ import com.example.demo.persistence.model.User;
 import com.example.demo.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,37 +43,18 @@ public class UserController {
 		return userService.findAll();
 	}
 
-	// @Todo: Fix the below
+	@DeleteMapping(value = "/delete/{id}")
+	public Mono<ResponseEntity<Void>> deleteUser(@PathVariable("id") Long id) {
+		return userService.findByUserId(id)
+				.flatMap(dbUser -> userService.deleteUser(dbUser).then(Mono.just(ResponseEntity.ok().<Void>build())))
+				.defaultIfEmpty(ResponseEntity.notFound().build());
+	}
 
-	// @DeleteMapping(value = "/delete/{id}")
-	// public ResponseEntity<User> deleteUser(@PathVariable("id") Long id) {
-	// try {
-	// Optional<User> userOpt = userService.findByUserId(id);
-	// User user = userOpt.get();
-	// if (user != null) {
-	// userService.deleteUser(user);
-	// return ResponseEntity.ok().body(user);
-	// } else {
-	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-	// }
-	// } catch (Exception e) {
-	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-	// }
-	// }
-
-	// @PutMapping(value = "/update")
-	// public ResponseEntity<User> updateUser(@RequestBody User user) {
-	// try {
-	// Optional<User> userOpt = userService.findByUserId(user.getUserId());
-	// User toUpdate = userOpt.get();
-	// if (toUpdate != null) {
-	// return ResponseEntity.ok(userService.updateUser(user));
-	// } else {
-	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-	// }
-	// } catch (Exception e) {
-	// return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
-	// }
-	// }
+	@PutMapping(value = "/update/{id}")
+	public Mono<ResponseEntity<User>> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
+		return userService.findByUserId(id).flatMap(dbUser -> {
+			return userService.updateUser(user);
+		}).map(updatedUser -> ResponseEntity.ok(updatedUser)).defaultIfEmpty(ResponseEntity.badRequest().build());
+	}
 
 }

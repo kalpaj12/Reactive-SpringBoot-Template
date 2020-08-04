@@ -12,7 +12,7 @@ public interface UserService {
 
 	public Flux<User> findAll();
 
-	public void deleteUser(User user);
+	public Mono<Void> deleteUser(User user);
 
 	public Mono<User> updateUser(User user);
 
